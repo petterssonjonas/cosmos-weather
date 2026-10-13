@@ -1,0 +1,16 @@
+[package]
+name = "cosmic-weather"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-only"
+description = "Native COSMIC weather application using MET Norway forecasts"
+
+[dependencies]
+libcosmic = { git = "https://github.com/pop-os/libcosmic.git", default-features = false, features = ["a11y", "dbus-config", "single-instance", "tokio", "winit"] }
+cosmic-applet-datetime-plus = { path = "../cosmic-applet-datetime-plus" }
+chrono = { version = "0.4", default-features = false, features = ["clock", "serde"] }
+chrono-tz = "0.10"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["fs", "io-util", "macros", "process", "sync", "time", "rt-multi-thread"] }
+libc = "0.2"

@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Weather
+GenericName=Weather Forecast
+Comment=MET Norway forecasts for the COSMIC desktop
+Type=Application
+Exec=cosmic-weather
+Icon=io.github.CosmicWeather-symbolic
+Terminal=false
+StartupNotify=true
+Categories=Utility;
+Keywords=Weather;Forecast;MET;Yr;COSMIC;

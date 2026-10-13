@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.CosmicWeather</id>
+  <name>Weather</name>
+  <summary>MET Norway forecasts for the COSMIC desktop</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-only</project_license>
+  <launchable type="desktop-id">io.github.CosmicWeather.desktop</launchable>
+  <description>
+    <p>A native COSMIC weather application with current conditions, hourly temperature charts, and daily forecasts from MET Norway, the meteorological service behind Yr.</p>
+    <p>Choose and save locations explicitly. Forecast requests share a private cache and conservative request limits with COSMIC Datetime Plus. No account, automatic location detection, or telemetry is required.</p>
+  </description>
+  <content_rating type="oars-1.1"/>
+</component>
