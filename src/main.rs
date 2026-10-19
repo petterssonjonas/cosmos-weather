@@ -14,7 +14,7 @@ fn main() -> std::process::ExitCode {
     {
         Ok(args) => args,
         Err(error) => {
-            eprintln!("cosmic-weather: {error}");
+            eprintln!("cosmos-weather: {error}");
             return std::process::ExitCode::from(2);
         }
     };
@@ -25,7 +25,7 @@ fn main() -> std::process::ExitCode {
         }
         Ok(cli::Parsed::Launch(launch)) => launch,
         Err(error) => {
-            eprintln!("cosmic-weather: {error}");
+            eprintln!("cosmos-weather: {error}");
             return std::process::ExitCode::from(2);
         }
     };
@@ -40,7 +40,7 @@ fn main() -> std::process::ExitCode {
     match cosmic::app::run_single_instance::<app::App>(settings, launch) {
         Ok(()) => std::process::ExitCode::SUCCESS,
         Err(error) => {
-            eprintln!("cosmic-weather: {error}");
+            eprintln!("cosmos-weather: {error}");
             std::process::ExitCode::FAILURE
         }
     }

@@ -12,7 +12,7 @@ use cosmic::{
     prelude::*,
     widget,
 };
-use cosmic_applet_datetime_plus::weather::{self, Client, Forecast, ForecastHour, WeatherLocation};
+use cosmos_applet_datetime_plus::weather::{self, Client, Forecast, ForecastHour, WeatherLocation};
 use std::{ops::Range, sync::Arc, time::Duration};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -83,7 +83,7 @@ impl cosmic::Application for App {
     type Executor = cosmic::executor::Default;
     type Flags = Launch;
     type Message = Message;
-    const APP_ID: &'static str = "io.github.CosmicWeather";
+    const APP_ID: &'static str = "dev.jp.CosmosWeather";
 
     fn core(&self) -> &Core {
         &self.core
@@ -120,14 +120,14 @@ impl cosmic::Application for App {
             search_generation: 0,
             link_error: None,
         };
-        app.set_header_title("Weather".into());
+        app.set_header_title("Cosmos Weather".into());
         if has_overrides {
             app.persist();
         }
         let title = app
             .core
             .main_window_id()
-            .map_or_else(Task::none, |id| app.set_window_title("Weather".into(), id));
+            .map_or_else(Task::none, |id| app.set_window_title("Cosmos Weather".into(), id));
         let refresh = app.refresh();
         (app, Task::batch([title, refresh]))
     }
@@ -550,7 +550,7 @@ impl App {
                 "No current hourly sample is available."
             }));
         }
-        let icon = current.map_or("io.github.CosmicWeather-symbolic", |h| {
+        let icon = current.map_or("dev.jp.CosmosWeather-symbolic", |h| {
             weather::icon_name(&h.symbol)
         });
         let mut hero = widget::row::with_capacity(4)
@@ -831,8 +831,8 @@ impl App {
         });
         content = content.push(widget::row::with_children(units).spacing(8))
             .push(widget::button::text("Manage locations").on_press(Message::Locations))
-            .push(widget::text::heading("Weather"))
-            .push(widget::text::body(format!("Version {} · GPL-3.0-only\nNative COSMIC application. Forecasts and city lookup use the shared datetime-plus weather client and cache.", env!("CARGO_PKG_VERSION"))))
+            .push(widget::text::heading("Cosmos Weather"))
+            .push(widget::text::body(format!("Version {} · GPL-3.0-only\nIndependent Cosmos family application for COSMIC. Forecasts and city lookup use the shared Cosmos Date & Time weather client and cache.", env!("CARGO_PKG_VERSION"))))
             .push(widget::text::body("Forecasts: MET Norway Locationforecast (CC BY 4.0). City search: Open-Meteo Geocoding, based on GeoNames. Calculated feels-like uses NWS wind-chill or heat-index formulas only when their inputs and applicability requirements are met."))
             .push(widget::text::caption("Automatic refresh: every 15 minutes. Manual refresh, activation and city changes never bypass provider cache, Expires or Retry-After. Stored preferences contain only selected/saved locations and temperature unit."))
             .push(widget::row::with_capacity(3).spacing(8)

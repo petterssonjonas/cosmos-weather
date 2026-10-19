@@ -1,10 +1,10 @@
 [Desktop Entry]
-Name=Weather
+Name=Cosmos Weather
 GenericName=Weather Forecast
 Comment=MET Norway forecasts for the COSMIC desktop
 Type=Application
-Exec=cosmic-weather
-Icon=io.github.CosmicWeather-symbolic
+Exec=cosmos-weather
+Icon=dev.jp.CosmosWeather-symbolic
 Terminal=false
 StartupNotify=true
 Categories=Utility;

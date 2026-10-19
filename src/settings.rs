@@ -1,5 +1,5 @@
 use crate::cli::Launch;
-use cosmic_applet_datetime_plus::weather::WeatherLocation;
+use cosmos_applet_datetime_plus::weather::WeatherLocation;
 use serde::{Deserialize, Serialize};
 use std::{
     fs,
@@ -88,7 +88,7 @@ impl Store {
             .filter(|s| !s.is_empty())
             .map(PathBuf::from)
             .or_else(|| std::env::var_os("HOME").map(|h| PathBuf::from(h).join(".config")))
-            .map(|p| p.join("cosmic-weather/settings.json"));
+            .map(|p| p.join("cosmos-weather/settings.json"));
         Self::load_path(path)
     }
 
@@ -202,7 +202,7 @@ mod tests {
     #[test]
     fn corrupted_preferences_remain_untouched() {
         let path =
-            std::env::temp_dir().join(format!("cosmic-weather-corrupt-{}", std::process::id()));
+            std::env::temp_dir().join(format!("cosmos-weather-corrupt-{}", std::process::id()));
         fs::write(&path, b"not json").unwrap();
         let (store, preferences, error) = Store::load_path(Some(path.clone()));
         assert!(error.is_some());

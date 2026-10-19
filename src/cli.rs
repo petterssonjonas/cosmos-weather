@@ -1,7 +1,7 @@
 use crate::settings::Unit;
-use cosmic_applet_datetime_plus::weather::WeatherLocation;
+use cosmos_applet_datetime_plus::weather::WeatherLocation;
 
-pub const HELP: &str = "Weather — native COSMIC weather\n\nUsage: cosmic-weather [--location-json JSON] [--unit celsius|fahrenheit]\n       cosmic-weather --help\n\nNo arguments opens saved preferences. Locations are chosen explicitly; no automatic\nlocation discovery occurs. Existing instances receive the location and unit.\nRefreshes respect the shared provider cache and cooldown.\n";
+pub const HELP: &str = "Cosmos Weather — weather for the COSMIC desktop\n\nUsage: cosmos-weather [--location-json JSON] [--unit celsius|fahrenheit]\n       cosmos-weather --help\n\nNo arguments opens saved preferences. Locations are chosen explicitly; no automatic\nlocation discovery occurs. Existing instances receive the location and unit.\nRefreshes respect the shared provider cache and cooldown.\n";
 
 #[derive(Clone, Debug, Default)]
 pub struct Launch {

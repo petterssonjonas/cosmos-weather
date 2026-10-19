@@ -1,7 +1,7 @@
 use chrono::{DateTime, Duration, NaiveDate, TimeZone, Utc};
 use chrono_tz::Tz;
 use cosmic::iced::{self, Point, Rectangle, mouse, widget::canvas};
-use cosmic_applet_datetime_plus::weather::ForecastHour;
+use cosmos_applet_datetime_plus::weather::ForecastHour;
 use std::{cell::Cell, collections::BTreeMap, ops::Range};
 
 pub const PAGE_SIZE: usize = 8;

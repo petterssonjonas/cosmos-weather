@@ -1,74 +1,103 @@
-# Weather for COSMIC
+# Cosmos Weather
 
-A native COSMIC weather application with a GNOME Weather-style layout: location selector, current-hour forecast, Hourly/Daily views, a horizontally paginated temperature graph, and forecast details. Display name: **Weather**. Application ID: `io.github.CosmicWeather`.
+A COSMIC desktop application with saved locations, current-hour forecasts, hourly and daily views, a temperature graph and forecast details. This is a normal application, not a panel applet.
 
-Forecasts come from [MET Norway Locationforecast](https://api.met.no/weatherapi/locationforecast/2.0/documentation), the meteorological service behind Yr. This is not an official Yr application and does not use Yr branding.
+## Requirements
+
+Runtime: a COSMIC desktop, graphical Wayland session, session D-Bus and HTTPS access for city searches and forecasts. No account, API key or Python process is required.
+
+Build/install: current stable Rust from [rustup](https://rustup.rs), `just`, Bash, GNU coreutils/findutils, Git and native development packages. Distribution Rust can be too old. Weather also needs the adjacent `cosmos-applet-datetime-plus` source repository to build. The installed executable runs independently.
+
+These package examples do not mean all distributions were tested. See [libcosmic dependencies](https://github.com/pop-os/libcosmic#dependencies).
+
+Fedora:
+
+```sh
+sudo dnf install git just gcc-c++ cmake pkgconf-pkg-config desktop-file-utils \
+  expat-devel freetype-devel fontconfig-devel wayland-devel libxkbcommon-devel \
+  libxkbcommon-x11-devel libinput-devel mesa-libEGL-devel libX11-devel \
+  libXcursor-devel libXi-devel libXrandr-devel dbus-devel openssl-devel
+```
+
+Debian 13 or newer:
+
+```sh
+sudo apt update
+sudo apt install git just build-essential cmake pkgconf desktop-file-utils \
+  libexpat1-dev libfreetype-dev libfontconfig-dev libwayland-dev libxkbcommon-dev \
+  libxkbcommon-x11-dev libinput-dev libegl1-mesa-dev libx11-dev libxcursor-dev \
+  libxi-dev libxrandr-dev libdbus-1-dev libssl-dev
+```
+
+Arch Linux:
+
+```sh
+sudo pacman -S --needed git just base-devel cmake pkgconf desktop-file-utils \
+  expat freetype2 fontconfig wayland libxkbcommon libxkbcommon-x11 libinput \
+  mesa libglvnd libx11 libxcursor libxi libxrandr dbus openssl
+```
+
+These are build/install packages, not additional Weather runtime programs. Rust tests use `just test`; `just check` also needs the rustup Clippy component. Shared weather-library tests belong to the datetime repository.
 
 ## Build and install
 
-Keep `cosmic-weather` and `cosmic-applet-datetime-plus` beside one another. Weather imports the latter repository's public weather library, rather than maintaining a second HTTP client or cache implementation. Both repositories are needed to build; the installed Weather executable runs independently.
-
-Requires a COSMIC session, a current Rust toolchain, `just`, `desktop-file-utils`, and the native Wayland/font/graphics development dependencies of [libcosmic](https://github.com/pop-os/libcosmic). Built on Fedora 44 with Rust 1.98.1.
+Install rustup from its linked site first. Run as your desktop user. Clone both repositories into the same parent directory:
 
 ```sh
-just
+mkdir -p ~/Projects
+cd ~/Projects
+git clone https://github.com/petterssonjonas/cosmos-applet-datetime-plus
+git clone https://github.com/petterssonjonas/cosmos-weather
+cd cosmos-weather
+rustup toolchain install stable
+rustup override set stable
+just build-release
 just install
 ```
 
-The default installation prefix is `~/.local`. `CARGO_TARGET_DIR` is respected. Launch **Weather** from the application launcher, run `cosmic-weather`, or click the weather card in **Date & Notifications**.
+The build uses `../cosmos-applet-datetime-plus` as a local path dependency. Do not move or rename that source directory before building. You do not need to install the datetime applet to use Weather.
 
-The app requests a 1040×660 window with a 920×620 minimum; COSMIC's tiling layout can assign a different size. Weather does not change tiling settings or force itself to float. Forecast pages and the native canvas graph adapt to the actual window width without stretching or clipping an SVG. Location lists, settings and detailed sample lists scroll when necessary.
+Use `sudo` only for system package prerequisites, never for `just build-release` or `just install`. Files go to `~/.local/bin` and `~/.local/share`. Use your mapped desktop user in build containers, not root.
 
-## Locations, units and applet integration
-
-- Choose a location explicitly; there is no automatic or IP-based location discovery.
-- City search runs only when submitted. Select a result to save and display it.
-- Use the location selector to switch or remove saved locations. Up to 64 locations can be saved.
-- Settings offers Celsius/Fahrenheit and provider information. Removing a selected saved location selects another saved location, or returns to location selection.
-- Clicking the applet's weather card passes its selected location and temperature unit. A running Weather instance receives the new selection instead of creating another window.
-- Weather's own saved locations and unit preferences are separate from applet preferences. Changes in Weather do not silently rewrite applet settings.
-
-The launch interface also supports explicit handoff:
+Launch **Cosmos Weather** from the desktop launcher, or run:
 
 ```sh
-cosmic-weather --location-json '{"name":"Oslo","latitude":59.91,"longitude":10.75,"timezone":"Europe/Oslo"}' --unit celsius
-cosmic-weather --help
+~/.local/bin/cosmos-weather
 ```
 
-Invalid or duplicate arguments exit with status 2 before loading preferences or opening a window. No-argument launches use saved preferences.
+If necessary, reopen the launcher or log in again. No panel enable step is needed. Installation does not change panel configuration or tiling settings.
 
-## Forecast semantics
+## Use and limits
 
-- The current display is a **forecast for the current hour**, not a weather-station observation. No suitable current sample means unavailable, not a fabricated temperature.
-- Hourly pages contain actual consecutive one-hour provider samples. The graph uses straight segments and stops at gaps; it does not invent hourly data in the later, lower-resolution forecast horizon.
-- Daily high/low values are derived from available samples in the location's timezone. Partial and sparse days are identified; they are not presented as complete-day extrema. The daily icon comes from the sample nearest local noon, not an invented all-day summary.
-- Dates and times use the location's IANA timezone, including DST. Detail views show actual timestamps, wind, humidity and one-hour precipitation when supplied.
-- Calculated feels-like uses [NWS wind chill](https://www.weather.gov/safety/cold-wind-chill-chart) or [NWS heat index](https://www.wpc.ncep.noaa.gov/html/heatindex_equation.shtml), only within their supported input domains. Missing measurements or unsupported conditions remain unavailable. Actual temperature is not substituted for a missing feels-like estimate.
-- Retrieved/provider-update timestamps, stale caches and provider errors remain visible. Cached data is not relabelled as fresh after a failed request.
+Search for a city explicitly, select a result, then choose Hourly or Daily. Settings provides Celsius/Fahrenheit and provider information. Up to 64 locations can be saved. There is no automatic or IP-based location detection.
 
-## Refresh, storage and privacy
+The current value is a forecast for the current hour, not a station observation. Missing values stay unavailable. Graphs stop at gaps; partial and sparse daily coverage is identified. Times use the selected location's timezone. Feels-like values use NWS wind-chill or heat-index calculations only within their supported ranges. Provider errors and stale data remain visible.
 
-Automatic checks run every **15 minutes**. Manual refresh, reopening, switching cities and applet activation all use the same durable provider gate as the datetime applet: at least 15 minutes between network requests across processes and locations, plus any later `Expires`, `Retry-After` or error-backoff deadline. An uncached location may therefore need to wait during a cooldown. Refreshing the UI can reuse cached data without another network request.
+The datetime applet can open Weather with its selected city and unit. An existing Weather window receives that selection instead of opening a duplicate. Weather preferences do not change applet preferences.
 
-- Preferences: `$XDG_CONFIG_HOME/cosmic-weather/settings.json`, normally `~/.config/cosmic-weather/settings.json`.
-- Shared forecast cache and request gate: `$XDG_CACHE_HOME/cosmic-applet-datetime-plus/`, normally `~/.cache/cosmic-applet-datetime-plus/`.
-- Preferences are private, validated and atomically replaced. Unreadable, malformed or unsupported existing preferences are not overwritten; the error remains visible.
-- Explicit city searches send the query and connection IP address to [Open-Meteo Geocoding](https://open-meteo.com/en/docs/geocoding-api), based on GeoNames. Forecast requests send selected coordinates, truncated to four decimal places, and the connection IP address to MET Norway over HTTPS.
-- No accounts, API keys, authentication tokens or telemetry are used. Both applications identify the shared client as `cosmic-applet-datetime-plus/0.1.0`; no fictional maintainer contact is supplied.
+## Privacy and storage
 
-## Verification and removal
+City searches send the query and connection IP address to [Open-Meteo Geocoding / GeoNames](https://open-meteo.com/en/docs/geocoding-api). Forecast requests send selected coordinates, truncated to four decimal places, and connection IP address to [MET Norway](https://api.met.no/weatherapi/locationforecast/2.0/documentation) over HTTPS. No telemetry or authentication tokens are used.
 
-```sh
-just check
-just uninstall
-```
+Automatic checks run every 15 minutes. Weather and the datetime applet share a durable provider gate across processes and locations. Network requests wait at least 15 minutes, or longer for server expiry and retry limits. Manual Refresh cannot bypass this gate. A newly selected uncached city can require a wait.
 
-Tests cover argument validation, preference preservation, hourly gaps, partial/sparse daily coverage and 23-/25-hour local dates. The shared library's tests live in `cosmic-applet-datetime-plus` and cover provider parsing, optional measurements, feels-like calculations, durable caching, cross-process locking and rate limits. Tests do not contact real weather providers.
+- Private preferences: `~/.config/cosmos-weather/settings.json`.
+- Shared forecast cache and provider request state: `~/.cache/cosmos-applet-datetime-plus/`.
 
-Uninstall removes the executable and desktop/icon/AppStream registration. Preferences and shared caches remain. Local AppStream metadata intentionally has no invented public homepage or developer identity; `appstreamcli validate` reports that missing publication metadata.
+Standard XDG variables override these defaults. Invalid or unsupported preference files are not silently overwritten.
+
+## Migration and removal
+
+Stop old Weather, the old datetime applet and all reminder windows before migration. Keep both generations stopped: their provider locks use separate names.
+
+Run `just migrate` here to copy old `cosmic-weather` preferences and the shared `cosmic-applet-datetime-plus` cache into their new `cosmos-*` namespaces. If the datetime applet already migrated the cache, run `just migrate false` here. If Weather migrated first, use `just migrate false` in `cosmos-applet-datetime-plus` afterward.
+
+Sources remain backups. Existing destinations, unsafe paths and non-regular files are refused. Each directory copy is atomic, but the copies are not one combined transaction. Resolve conflicts before retrying. There is no automatic migration or legacy executable alias. Use the old version's uninstaller, if available, to remove obsolete registrations. Keep data backups until the new applications work correctly.
+
+Run `just uninstall` to remove this version. Preferences and shared caches remain.
 
 ## Credits and license
 
-Application code: GPL-3.0-only; see `LICENSE`. Native application conventions follow the [COSMIC app template](https://github.com/pop-os/cosmic-app-template).
+Independent project; not an official System76 or Yr application. Code: GPL-3.0-only; see `LICENSE`. Native conventions follow the [COSMIC app template](https://github.com/pop-os/cosmic-app-template).
 
-Forecast data: **MET Norway, [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)**. Adaptations include selecting and grouping samples, mapping condition icons, graphing and rounding temperatures, unit conversion and calculated feels-like estimates. City lookup: **Open-Meteo / GeoNames**. Provider attribution and links are also available in Settings.
+Forecast data: MET Norway, [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Adaptations include sample selection and grouping, condition icons, graphing, rounding, unit conversion and calculated feels-like values. City lookup: Open-Meteo / GeoNames. Provider attribution and links also appear in Settings.
